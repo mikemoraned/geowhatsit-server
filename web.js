@@ -86,22 +86,38 @@
 
   Stream = (function() {
 
-    function Stream(tweetCounts, twitter) {
+    function Stream(tweetCounts, twitter, restartAfterSeconds) {
       var _this = this;
       this.tweetCounts = tweetCounts;
       this.twitter = twitter;
+      if (restartAfterSeconds == null) {
+        restartAfterSeconds = 30 * 60;
+      }
       this.handleData = function(data) {
         return Stream.prototype.handleData.apply(_this, arguments);
       };
+      this.restart = function() {
+        return Stream.prototype.restart.apply(_this, arguments);
+      };
+      this.restartAfterMillis = restartAfterSeconds * 1000;
     }
 
     Stream.prototype.start = function() {
       var _this = this;
       return this.twitter.stream('statuses/sample', function(stream) {
         _this.stream = stream;
-        console.log("Started listening for tweets");
-        return stream.on('data', _this.handleData);
+        console.log("Started listening for tweets, will restart after " + _this.restartAfterMillis + " millis");
+        stream.on('data', _this.handleData);
+        return setTimeout(_this.restart, _this.restartAfterMillis);
       });
+    };
+
+    Stream.prototype.restart = function() {
+      if (this.stream != null) {
+        console.log("Destroying stream");
+        this.stream.destroy();
+      }
+      return this.start();
     };
 
     Stream.prototype.handleData = function(data) {
