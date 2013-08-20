@@ -2,8 +2,6 @@ express = require("express")
 app = express()
 app.use(express.logger())
 
-
-
 util = require('util')
 twitter = require('twitter')
 
@@ -14,15 +12,19 @@ twit = new twitter({
   access_token_secret: process.env['TWITTER_ACCESS_TOKEN_SECRET']
 })
 
-geolib = require('geolib')
+#geolib = require('geolib')
 
 class LatLon
   constructor: (lat, lon) ->
     @latitude = lat
     @longitude = lon
 
-  canonicalId: () ->
+  toId: () ->
     "#{@latitude},#{@longitude}"
+
+  @fromId: (id) ->
+    [latS, lonS] = id.split(",")
+    new LatLon(parseFloat(latS), parseFloat(lonS))
 
 class TweetCounts
   constructor: () ->
@@ -31,7 +33,7 @@ class TweetCounts
 
   add: (latLon) ->
     @total++
-    id = latLon.canonicalId()
+    id = latLon.toId()
     count = @map[id]
     if count?
       @map[id] = count + 1
@@ -40,7 +42,7 @@ class TweetCounts
 
   dump: () -> {
     'total' : @total
-    'lat_lon' : @map
+    'counts' : { lat_lon: LatLon.fromId(id), count: count } for id, count of @map
   }
 
 tweetCounts = new TweetCounts
@@ -65,7 +67,6 @@ app.get('/', (req, resp) ->
 app.get('/counts.json', (req, resp) ->
   resp.send(tweetCounts.dump())
 )
-
 
 port = process.env.PORT || 5000
 app.listen(port, () ->
