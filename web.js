@@ -76,12 +76,18 @@
     });
   });
 
-  app.get('/', function(request, response) {
-    return response.send('Hello World!');
+  app.all('*', function(req, resp, next) {
+    resp.header("Access-Control-Allow-Origin", "*");
+    resp.header("Access-Control-Allow-Headers", "X-Requested-With");
+    return next();
   });
 
-  app.get('/counts.json', function(request, response) {
-    return response.send(tweetCounts.dump());
+  app.get('/', function(req, resp) {
+    return resp.send('Hello World!');
+  });
+
+  app.get('/counts.json', function(req, resp) {
+    return resp.send(tweetCounts.dump());
   });
 
   port = process.env.PORT || 5000;

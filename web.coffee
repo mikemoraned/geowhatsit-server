@@ -53,11 +53,17 @@ twit.stream('statuses/sample', (stream) ->
   )
 )
 
-app.get('/', (request, response) ->
-  response.send('Hello World!')
+app.all('*', (req, resp, next) ->
+  resp.header("Access-Control-Allow-Origin", "*")
+  resp.header("Access-Control-Allow-Headers", "X-Requested-With")
+  next()
 )
-app.get('/counts.json', (request, response) ->
-  response.send(tweetCounts.dump())
+
+app.get('/', (req, resp) ->
+  resp.send('Hello World!')
+)
+app.get('/counts.json', (req, resp) ->
+  resp.send(tweetCounts.dump())
 )
 
 
