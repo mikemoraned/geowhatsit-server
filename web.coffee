@@ -45,15 +45,23 @@ class TweetCounts
     'counts' : { lat_lon: LatLon.fromId(id), count: count } for id, count of @map
   }
 
-tweetCounts = new TweetCounts
+class Stream
+  constructor: (@tweetCounts, @twitter) ->
 
-twit.stream('statuses/sample', (stream) ->
-  stream.on('data', (data) ->
+  start: () ->
+    @twitter.stream('statuses/sample', (stream) =>
+      @stream = stream
+      console.log("Started listening for tweets")
+      stream.on('data', @handleData)
+    )
+
+  handleData: (data) =>
     if data.geo? and data.geo.coordinates?
-#      console.log(util.inspect(data))
-      tweetCounts.add(new LatLon(data.geo.coordinates[0], data.geo.coordinates[1]))
-  )
-)
+      @tweetCounts.add(new LatLon(data.geo.coordinates[0], data.geo.coordinates[1]))
+
+tweetCounts = new TweetCounts
+stream = new Stream(tweetCounts, twit)
+stream.start()
 
 app.all('*', (req, resp, next) ->
   resp.header("Access-Control-Allow-Origin", "*")
