@@ -87,7 +87,7 @@ class TweetCountsFactory
       if process.env.REDISTOGO_URL
         console.log("Using Redis To Go")
         rtg = require("url").parse(process.env.REDISTOGO_URL)
-        redis = require("redis").createClient(rtg.port, rtg.hostname)
+        redis = require("node-redis").createClient(rtg.port, rtg.hostname)
         redis.auth(rtg.auth.split(":")[1])
       else
         console.log("Using local Redis")
