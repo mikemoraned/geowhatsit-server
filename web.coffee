@@ -84,8 +84,15 @@ class RedisTweetCounts
 class TweetCountsFactory
   @create: () ->
     try
-      redis = require("node-redis").createClient()
-      console.log("Creating redis client")
+      if process.env.REDISTOGO_URL
+        console.log("Using Redis To Go")
+        rtg = require("url").parse(process.env.REDISTOGO_URL)
+        redis = require("redis").createClient(rtg.port, rtg.hostname)
+        redis.auth(rtg.auth.split(":")[1])
+      else
+        console.log("Using local Redis")
+        redis = require("node-redis").createClient()
+
       new RedisTweetCounts(redis)
     catch e
       console.log("Falling back to in-memory counts")
