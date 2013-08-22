@@ -67,14 +67,10 @@ class RedisTweetCounts
         counts = []
         for fullId in fullIds
           do (fullId) =>
-            feep = "#{fullId}"
-            @redis.get(feep, (err, countBuffer) =>
-              console.log("foop")
-              console.dir(feep.toString())
-              id = feep.toString().substring(@prefix.length)
+            @redis.get(fullId, (err, countBuffer) =>
+              id = fullId.toString().substring(@prefix.length)
               count = parseInt(countBuffer.toString())
               entry = { lat_lon: LatLon.fromId(id), count: count }
-              console.dir(entry)
               counts.push(entry)
               if fullIds.length == counts.length
                 callback({

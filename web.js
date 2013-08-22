@@ -120,19 +120,14 @@
           for (_i = 0, _len = fullIds.length; _i < _len; _i++) {
             fullId = fullIds[_i];
             _results.push((function(fullId) {
-              var feep;
-              feep = "" + fullId;
-              return _this.redis.get(feep, function(err, countBuffer) {
+              return _this.redis.get(fullId, function(err, countBuffer) {
                 var count, entry, id;
-                console.log("foop");
-                console.dir(feep.toString());
-                id = feep.toString().substring(_this.prefix.length);
+                id = fullId.toString().substring(_this.prefix.length);
                 count = parseInt(countBuffer.toString());
                 entry = {
                   lat_lon: LatLon.fromId(id),
                   count: count
                 };
-                console.dir(entry);
                 counts.push(entry);
                 if (fullIds.length === counts.length) {
                   return callback({
