@@ -136,7 +136,7 @@ app.get('/counts.json', (req, resp) ->
 
 geohash = require('ngeohash')
 _ = require('underscore')
-app.get('/counts/grouped-by-geohash/:precision.json', (req, resp) ->
+app.get('/counts/grouped-by-geohash/precision-:precision.json', (req, resp) ->
   tweetCounts.dump((dumped) ->
     byGeoHash = _.countBy(dumped.counts, (entry) ->
       geohash.encode(entry.lat_lon.latitude, entry.lat_lon.longitude, req.params.precision)

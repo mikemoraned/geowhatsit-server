@@ -240,7 +240,7 @@
 
   _ = require('underscore');
 
-  app.get('/counts/grouped-by-geohash/:precision.json', function(req, resp) {
+  app.get('/counts/grouped-by-geohash/precision-:precision.json', function(req, resp) {
     return tweetCounts.dump(function(dumped) {
       var byGeoHash, counts;
       byGeoHash = _.countBy(dumped.counts, function(entry) {
