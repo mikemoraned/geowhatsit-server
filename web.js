@@ -152,16 +152,21 @@
     function TweetCountsFactory() {}
 
     TweetCountsFactory.create = function() {
-      var redis;
-      try {
-        console.log("Using Redis");
-        redis = require("heroku-redis-client").createClient();
-        return new RedisTweetCounts(redis);
-      } catch (e) {
-        console.log("Falling back to in-memory counts");
-        console.dir(e);
-        return new InMemoryTweetCounts();
+      var client, redis, redisURL, url;
+      redis = require('node-redis');
+      if (process.env.REDISCLOUD_URL != null) {
+        console.log("Using RedisCloud Redis");
+        url = require('url');
+        redisURL = url.parse(process.env.REDISCLOUD_URL);
+        client = redis.createClient(redisURL.port, redisURL.hostname, {
+          no_ready_check: true
+        });
+        client.auth(redisURL.auth.split(":")[1]);
+      } else {
+        console.log("Using Local Redis");
+        client = redis.createClient();
       }
+      return new RedisTweetCounts(client);
     };
 
     return TweetCountsFactory;
