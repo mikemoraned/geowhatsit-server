@@ -38,14 +38,11 @@ class RedisTweetCounts
     @prefix = "#{@version}.geohash:#{@precision}:"
 
   add: (latLon) ->
-    @incKey("#{@version}count")
-    @incKey(@latLonFullId(latLon))
+    @redis.incr("#{@version}count")
+    @redis.incr(@latLonFullId(latLon))
 
   latLonFullId: (latLon) =>
     "#{@prefix}#{latLon.toGeoHash(@precision)}"
-
-  incKey: (key) =>
-    @redis.incr(key)
 
   dump: (callback) ->
     @redis.get("#{@version}count", (err, totalBuffer) =>

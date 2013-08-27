@@ -59,9 +59,6 @@
       var _this = this;
       this.redis = redis;
       this.precision = precision != null ? precision : 6;
-      this.incKey = function(key) {
-        return RedisTweetCounts.prototype.incKey.apply(_this, arguments);
-      };
       this.latLonFullId = function(latLon) {
         return RedisTweetCounts.prototype.latLonFullId.apply(_this, arguments);
       };
@@ -70,16 +67,12 @@
     }
 
     RedisTweetCounts.prototype.add = function(latLon) {
-      this.incKey("" + this.version + "count");
-      return this.incKey(this.latLonFullId(latLon));
+      this.redis.incr("" + this.version + "count");
+      return this.redis.incr(this.latLonFullId(latLon));
     };
 
     RedisTweetCounts.prototype.latLonFullId = function(latLon) {
       return "" + this.prefix + (latLon.toGeoHash(this.precision));
-    };
-
-    RedisTweetCounts.prototype.incKey = function(key) {
-      return this.redis.incr(key);
     };
 
     RedisTweetCounts.prototype.dump = function(callback) {
