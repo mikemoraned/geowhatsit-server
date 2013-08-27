@@ -71,15 +71,18 @@
     }
 
     RedisTweetCounts.prototype.add = function(latLon, text) {
-      var id, nGram, _i, _len, _ref, _results;
+      var latLonId, nGram, nGramId, _i, _len, _ref, _results;
       this.redis.incr("" + this.version + "." + this.precision + ":count");
-      id = this.latLonFullId(latLon);
-      this.redis.zincrby("" + this.version + ".geohashes:" + this.precision, 1, id);
+      latLonId = this.latLonFullId(latLon);
+      this.redis.zincrby("" + this.version + ".geohashes:" + this.precision, 1, latLonId);
       _ref = text.nGrams;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         nGram = _ref[_i];
-        _results.push(this.redis.hincrby(id, "ng:" + text.length + ":" + nGram, 1));
+        nGramId = "" + this.version + ".ngram:" + text.length + ":" + nGram;
+        this.redis.zincrby("" + this.version + ".ngrams:" + text.length, 1, nGramId);
+        this.redis.hincrby(latLonId, nGramId, 1);
+        _results.push(this.redis.hincrby(nGramId, latLonId, 1));
       }
       return _results;
     };

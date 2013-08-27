@@ -41,10 +41,13 @@ class RedisTweetCounts
 
   add: (latLon, text) ->
     @redis.incr("#{@version}.#{@precision}:count")
-    id = @latLonFullId(latLon)
-    @redis.zincrby("#{@version}.geohashes:#{@precision}", 1, id)
+    latLonId = @latLonFullId(latLon)
+    @redis.zincrby("#{@version}.geohashes:#{@precision}", 1, latLonId)
     for nGram in text.nGrams
-      @redis.hincrby(id, "ng:#{text.length}:#{nGram}", 1)
+      nGramId = "#{@version}.ngram:#{text.length}:#{nGram}"
+      @redis.zincrby("#{@version}.ngrams:#{text.length}", 1, nGramId)
+      @redis.hincrby(latLonId, nGramId, 1)
+      @redis.hincrby(nGramId, latLonId, 1)
 
   latLonFullId: (latLon) =>
     "#{@prefix}#{latLon.toGeoHash(@precision)}"
