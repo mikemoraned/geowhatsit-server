@@ -4,6 +4,7 @@ app.use(express.logger())
 
 util = require('util')
 twitter = require('twitter')
+geohash = require('ngeohash')
 
 twit = new twitter({
   consumer_key: 'mCp0qZ0zGGcvA9ZKVo7xQ',
@@ -11,8 +12,6 @@ twit = new twitter({
   access_token_key: '11510772-MZIWUADlvY7A9Cbz6kKpqbuRM7EfWrdskAnXNpxpE',
   access_token_secret: process.env['TWITTER_ACCESS_TOKEN_SECRET']
 })
-
-#geolib = require('geolib')
 
 class LatLon
   constructor: (lat, lon) ->
@@ -22,55 +21,43 @@ class LatLon
   toId: () ->
     "#{@latitude},#{@longitude}"
 
+  toGeoHash: (precision) ->
+    geohash.encode(@latitude, @longitude, precision)
+
   @fromId: (id) ->
     [latS, lonS] = id.split(",")
     new LatLon(parseFloat(latS), parseFloat(lonS))
 
-class InMemoryTweetCounts
-  constructor: () ->
-    @total = 0
-    @map = {}
-
-  add: (latLon) ->
-    @total++
-    id = latLon.toId()
-    count = @map[id]
-    if count?
-      @map[id] = count + 1
-    else
-      @map[id] = 1
-
-  dump: (callback) ->
-    callback({
-      'total' : @total
-      'counts' : { lat_lon: LatLon.fromId(id), count: count } for id, count of @map
-    })
+  @fromGeoHash: (geoHash) ->
+    decoded = geohash.decode(geoHash)
+    new LatLon(decoded.latitude, decoded.longitude)
 
 class RedisTweetCounts
-  constructor: (@redis) ->
-    @prefix = "latLon."
+  constructor: (@redis, @precision = 6) ->
+    @version = "v2"
+    @prefix = "#{@version}.geohash:#{@precision}:"
 
   add: (latLon) ->
-    @incKey("total")
+    @incKey("#{@version}count")
     @incKey(@latLonFullId(latLon))
 
-  latLonFullId: (latLon) ->
-    "#{@prefix}#{latLon.toId()}"
+  latLonFullId: (latLon) =>
+    "#{@prefix}#{latLon.toGeoHash(@precision)}"
 
   incKey: (key) =>
     @redis.incr(key)
 
   dump: (callback) ->
-    @redis.get("total", (err, totalBuffer) =>
+    @redis.get("#{@version}count", (err, totalBuffer) =>
       total = parseInt(totalBuffer.toString())
       @redis.keys("#{@prefix}*", (err, fullIds) =>
         counts = []
         for fullId in fullIds
           do (fullId) =>
             @redis.get(fullId, (err, countBuffer) =>
-              id = fullId.toString().substring(@prefix.length)
+              geoHash = fullId.toString().substring(@prefix.length)
               count = parseInt(countBuffer.toString())
-              entry = { lat_lon: LatLon.fromId(id), count: count }
+              entry = { lat_lon: LatLon.fromGeoHash(geoHash), count: count }
               counts.push(entry)
               if fullIds.length == counts.length
                 callback({
@@ -137,7 +124,6 @@ app.get('/counts.json', (req, resp) ->
   )
 )
 
-geohash = require('ngeohash')
 _ = require('underscore')
 app.get('/counts/grouped-by-geohash/precision-:precision.json', (req, resp) ->
   tweetCounts.dump((dumped) ->
