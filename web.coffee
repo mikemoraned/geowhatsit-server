@@ -6,6 +6,7 @@ util = require('util')
 twitter = require('twitter')
 geohash = require('ngeohash')
 _ = require('underscore')
+NGrams = require("natural").NGrams
 
 twit = new twitter({
   consumer_key: 'mCp0qZ0zGGcvA9ZKVo7xQ',
@@ -38,10 +39,12 @@ class RedisTweetCounts
     @version = "v3"
     @prefix = "#{@version}.geohash:#{@precision}:"
 
-  add: (latLon) ->
+  add: (latLon, text) ->
     @redis.incr("#{@version}.#{@precision}:count")
     id = @latLonFullId(latLon)
     @redis.zincrby("#{@version}.geohashes:#{@precision}", 1, id)
+    for nGram in text.nGrams
+      @redis.hincrby(id, "ng:#{text.length}:#{nGram}", 1)
 
   latLonFullId: (latLon) =>
     "#{@prefix}#{latLon.toGeoHash(@precision)}"
@@ -87,8 +90,23 @@ class TweetCountsFactory
 
     new RedisTweetCounts(client)
 
+class TweetTokenizer
+
+  constructor: (@length) ->
+
+  nGrams: (text) =>
+    words = "^#{text}$".toLowerCase().split(/\s+/)
+    #    console.dir(words)
+    nGramsForEachWord = _.flatten((NGrams.ngrams(word.split(""), @length) for word in words), true)
+    #    console.dir(nGramsForEachWord)
+    nGrams = _.uniq(_.map(nGramsForEachWord, (d) -> d.join("")))
+    {
+    'length' : @length
+    'nGrams': nGrams
+    }
+
 class Stream
-  constructor: (@tweetCounts, @twitter, restartAfterSeconds = 30 * 60) ->
+  constructor: (@tweetCounts, @twitter, @tokenizer, restartAfterSeconds = 30 * 60) ->
     @restartAfterMillis = restartAfterSeconds * 1000
 
   start: () ->
@@ -107,10 +125,10 @@ class Stream
 
   handleData: (data) =>
     if data.geo? and data.geo.coordinates?
-      @tweetCounts.add(new LatLon(data.geo.coordinates[0], data.geo.coordinates[1]))
+      @tweetCounts.add(new LatLon(data.geo.coordinates[0], data.geo.coordinates[1]), @tokenizer.nGrams(data.text))
 
 tweetCounts = TweetCountsFactory.create()
-stream = new Stream(tweetCounts, twit)
+stream = new Stream(tweetCounts, twit, new TweetTokenizer(2))
 stream.start()
 
 app.all('*', (req, resp, next) ->

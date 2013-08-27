@@ -9,7 +9,8 @@
     "heroku-redis-client": "~0.3.3",
     "ngeohash": "~0.2.0",
     "underscore": "~1.5.1",
-    "redis": "~0.8.4"
+    "redis": "~0.8.4",
+    "natural": "~0.1.21"
   },
   "engines": {
     "node": "0.10.x",
