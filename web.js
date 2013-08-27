@@ -15,6 +15,8 @@
 
   geohash = require('ngeohash');
 
+  _ = require('underscore');
+
   twit = new twitter({
     consumer_key: 'mCp0qZ0zGGcvA9ZKVo7xQ',
     consumer_secret: 'X1Z4FaK8Hv68ZoTUCmiRjDy6IP5d5n7OHYwC6es4A',
@@ -62,13 +64,15 @@
       this.latLonFullId = function(latLon) {
         return RedisTweetCounts.prototype.latLonFullId.apply(_this, arguments);
       };
-      this.version = "v2";
+      this.version = "v3";
       this.prefix = "" + this.version + ".geohash:" + this.precision + ":";
     }
 
     RedisTweetCounts.prototype.add = function(latLon) {
-      this.redis.incr("" + this.version + "count");
-      return this.redis.incr(this.latLonFullId(latLon));
+      var id;
+      this.redis.incr("" + this.version + "." + this.precision + ":count");
+      id = this.latLonFullId(latLon);
+      return this.redis.zincrby("" + this.version + ".geohashes:" + this.precision, 1, id);
     };
 
     RedisTweetCounts.prototype.latLonFullId = function(latLon) {
@@ -77,36 +81,35 @@
 
     RedisTweetCounts.prototype.dump = function(callback) {
       var _this = this;
-      return this.redis.get("" + this.version + "count", function(err, totalBuffer) {
+      return this.redis.get("" + this.version + "." + this.precision + ":count", function(err, totalBuffer) {
         var total;
-        total = parseInt(totalBuffer.toString());
-        return _this.redis.keys("" + _this.prefix + "*", function(err, fullIds) {
-          var counts, fullId, _i, _len, _results;
-          counts = [];
-          _results = [];
-          for (_i = 0, _len = fullIds.length; _i < _len; _i++) {
-            fullId = fullIds[_i];
-            _results.push((function(fullId) {
-              return _this.redis.get(fullId, function(err, countBuffer) {
-                var count, entry, geoHash;
-                geoHash = fullId.toString().substring(_this.prefix.length);
-                count = parseInt(countBuffer.toString());
-                entry = {
-                  lat_lon: LatLon.fromGeoHash(geoHash),
-                  count: count
-                };
-                counts.push(entry);
-                if (fullIds.length === counts.length) {
-                  return callback({
-                    'total': total,
-                    'counts': counts
-                  });
-                }
-              });
-            })(fullId));
-          }
-          return _results;
-        });
+        if (err != null) {
+          console.log(err);
+          return callback({
+            'total': 0,
+            'counts': 0
+          });
+        } else {
+          total = parseInt(totalBuffer.toString());
+          return _this.redis.zrange(["" + _this.version + ".geohashes:" + _this.precision, 0, -1, 'withscores'], function(err, response) {
+            var count, counts, entry, fullId, geoHash, keyIndex, _i, _ref;
+            counts = [];
+            for (keyIndex = _i = 0, _ref = response.length; _i < _ref; keyIndex = _i += 2) {
+              fullId = response[keyIndex];
+              geoHash = fullId.toString().substring(_this.prefix.length);
+              count = parseInt(response[keyIndex + 1].toString());
+              entry = {
+                lat_lon: LatLon.fromGeoHash(geoHash),
+                count: count
+              };
+              counts.push(entry);
+            }
+            return callback({
+              'total': total,
+              'counts': counts
+            });
+          });
+        }
       });
     };
 
@@ -207,8 +210,6 @@
       return resp.send(dumped);
     });
   });
-
-  _ = require('underscore');
 
   app.get('/counts/grouped-by-geohash/precision-:precision.json', function(req, resp) {
     return tweetCounts.dump(function(dumped) {

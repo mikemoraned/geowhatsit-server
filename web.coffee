@@ -5,6 +5,7 @@ app.use(express.logger())
 util = require('util')
 twitter = require('twitter')
 geohash = require('ngeohash')
+_ = require('underscore')
 
 twit = new twitter({
   consumer_key: 'mCp0qZ0zGGcvA9ZKVo7xQ',
@@ -34,35 +35,41 @@ class LatLon
 
 class RedisTweetCounts
   constructor: (@redis, @precision = 6) ->
-    @version = "v2"
+    @version = "v3"
     @prefix = "#{@version}.geohash:#{@precision}:"
 
   add: (latLon) ->
-    @redis.incr("#{@version}count")
-    @redis.incr(@latLonFullId(latLon))
+    @redis.incr("#{@version}.#{@precision}:count")
+    id = @latLonFullId(latLon)
+    @redis.zincrby("#{@version}.geohashes:#{@precision}", 1, id)
 
   latLonFullId: (latLon) =>
     "#{@prefix}#{latLon.toGeoHash(@precision)}"
 
   dump: (callback) ->
-    @redis.get("#{@version}count", (err, totalBuffer) =>
-      total = parseInt(totalBuffer.toString())
-      @redis.keys("#{@prefix}*", (err, fullIds) =>
-        counts = []
-        for fullId in fullIds
-          do (fullId) =>
-            @redis.get(fullId, (err, countBuffer) =>
-              geoHash = fullId.toString().substring(@prefix.length)
-              count = parseInt(countBuffer.toString())
-              entry = { lat_lon: LatLon.fromGeoHash(geoHash), count: count }
-              counts.push(entry)
-              if fullIds.length == counts.length
-                callback({
-                  'total'  : total,
-                  'counts' : counts
-                })
-            )
-      )
+    @redis.get("#{@version}.#{@precision}:count", (err, totalBuffer) =>
+      if err?
+        console.log(err)
+        callback({
+          'total'  : 0,
+          'counts' : 0
+        })
+      else
+        total = parseInt(totalBuffer.toString())
+        @redis.zrange(["#{@version}.geohashes:#{@precision}", 0, -1, 'withscores'], (err, response) =>
+#          console.dir(response)
+          counts = []
+          for keyIndex in [0 ... response.length] by 2
+            fullId = response[keyIndex]
+            geoHash = fullId.toString().substring(@prefix.length)
+            count = parseInt(response[keyIndex + 1].toString())
+            entry = { lat_lon: LatLon.fromGeoHash(geoHash), count: count }
+            counts.push(entry)
+          callback({
+                    'total'  : total,
+                    'counts' : counts
+                  })
+        )
     )
 
 class TweetCountsFactory
@@ -121,7 +128,6 @@ app.get('/counts.json', (req, resp) ->
   )
 )
 
-_ = require('underscore')
 app.get('/counts/grouped-by-geohash/precision-:precision.json', (req, resp) ->
   tweetCounts.dump((dumped) ->
     byGeoHash = _.countBy(dumped.counts, (entry) ->
