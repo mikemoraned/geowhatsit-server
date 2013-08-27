@@ -83,7 +83,7 @@ class RedisTweetCounts
 
 class TweetCountsFactory
   @create: () ->
-    redis = require('node-redis')
+    redis = require('redis')
     if process.env.REDISCLOUD_URL?
       console.log("Using RedisCloud Redis")
       url = require('url')

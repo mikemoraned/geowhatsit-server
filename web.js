@@ -153,7 +153,7 @@
 
     TweetCountsFactory.create = function() {
       var client, redis, redisURL, url;
-      redis = require('node-redis');
+      redis = require('redis');
       if (process.env.REDISCLOUD_URL != null) {
         console.log("Using RedisCloud Redis");
         url = require('url');
