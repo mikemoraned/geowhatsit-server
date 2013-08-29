@@ -35,7 +35,7 @@ class LatLon
     new LatLon(decoded.latitude, decoded.longitude)
 
 class RedisTweetCounts
-  constructor: (@redis, @precision = 6) ->
+  constructor: (@redis, @precision = 3) ->
     @version = "v3"
     @prefix = "#{@version}.geohash:#{@precision}:"
 

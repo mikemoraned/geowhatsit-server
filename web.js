@@ -62,7 +62,7 @@
     function RedisTweetCounts(redis, precision) {
       var _this = this;
       this.redis = redis;
-      this.precision = precision != null ? precision : 6;
+      this.precision = precision != null ? precision : 3;
       this.latLonFullId = function(latLon) {
         return RedisTweetCounts.prototype.latLonFullId.apply(_this, arguments);
       };
