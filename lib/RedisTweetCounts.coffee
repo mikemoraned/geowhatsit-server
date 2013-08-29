@@ -28,7 +28,7 @@ class RedisTweetCounts
         })
       else
         total = parseInt(totalBuffer.toString())
-        @redis.zrange(["#{@version}.geohashes:#{@precision}", 0, -1, 'withscores'], (err, response) =>
+        @redis.zrevrange(["#{@version}.geohashes:#{@precision}", 0, -1, 'withscores'], (err, response) =>
 #          console.dir(response)
           counts = []
           for keyIndex in [0 ... response.length] by 2
