@@ -4,6 +4,7 @@ app.use(express.logger())
 
 twitter = require('twitter')
 _ = require('underscore')
+geohash = require('ngeohash')
 
 LatLon = require("./lib/LatLon")
 TweetCountsFactory = require("./lib/TweetCountsFactory")
