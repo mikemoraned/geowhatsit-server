@@ -29,7 +29,7 @@
     access_token_secret: process.env['TWITTER_ACCESS_TOKEN_SECRET']
   });
 
-  tweetCounts = TweetCountsFactory.create();
+  tweetCounts = TweetCountsFactory.create(2);
 
   stream = new Stream(tweetCounts, twit, new TweetTokenizer(2));
 

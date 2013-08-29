@@ -1,7 +1,7 @@
 LatLon = require("./LatLon")
 
 class RedisTweetCounts
-  constructor: (@redis, @precision = 3) ->
+  constructor: (@redis, @precision) ->
     @version = "v3"
     @prefix = "#{@version}.geohash:#{@precision}:"
 
