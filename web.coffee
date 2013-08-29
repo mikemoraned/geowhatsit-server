@@ -5,10 +5,10 @@ app.use(express.logger())
 twitter = require('twitter')
 _ = require('underscore')
 
-LatLon = require("./LatLon")
-TweetCountsFactory = require("./TweetCountsFactory")
-TweetTokenizer = require("./TweetTokenizer")
-Stream = require("./Stream")
+LatLon = require("./lib/LatLon")
+TweetCountsFactory = require("./lib/TweetCountsFactory")
+TweetTokenizer = require("./lib/TweetTokenizer")
+Stream = require("./lib/Stream")
 
 twit = new twitter({
   consumer_key: 'mCp0qZ0zGGcvA9ZKVo7xQ',
