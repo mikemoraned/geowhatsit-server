@@ -1,6 +1,6 @@
 redis = require('redis')
 url = require('url')
-RedisTweetCounts = require('./RedisTweetCounts.js')
+RedisTweetCounts = require('./RedisTweetCounts')
 
 class TweetCountsFactory
   @create: () ->

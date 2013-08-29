@@ -6,7 +6,7 @@
 
   url = require('url');
 
-  RedisTweetCounts = require('./RedisTweetCounts.js');
+  RedisTweetCounts = require('./RedisTweetCounts');
 
   TweetCountsFactory = (function() {
 

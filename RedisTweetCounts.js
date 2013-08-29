@@ -3,7 +3,7 @@
   var LatLon, RedisTweetCounts,
     _this = this;
 
-  LatLon = require("./LatLon.js");
+  LatLon = require("./LatLon");
 
   RedisTweetCounts = (function() {
 

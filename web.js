@@ -12,13 +12,13 @@
 
   _ = require('underscore');
 
-  LatLon = require("./LatLon.js");
+  LatLon = require("./LatLon");
 
-  TweetCountsFactory = require("./TweetCountsFactory.js");
+  TweetCountsFactory = require("./TweetCountsFactory");
 
-  TweetTokenizer = require("./TweetTokenizer.js");
+  TweetTokenizer = require("./TweetTokenizer");
 
-  Stream = require("./Stream.js");
+  Stream = require("./Stream");
 
   twit = new twitter({
     consumer_key: 'mCp0qZ0zGGcvA9ZKVo7xQ',

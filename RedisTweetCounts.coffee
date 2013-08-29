@@ -1,4 +1,4 @@
-LatLon = require("./LatLon.js")
+LatLon = require("./LatLon")
 
 class RedisTweetCounts
   constructor: (@redis, @precision = 3) ->
