@@ -10,6 +10,7 @@ LatLon = require("./lib/LatLon")
 TweetCountsFactory = require("./lib/TweetCountsFactory")
 TweetTokenizer = require("./lib/TweetTokenizer")
 Stream = require("./lib/Stream")
+Graphite = require("./lib/Graphite")
 
 twit = new twitter({
   consumer_key: 'mCp0qZ0zGGcvA9ZKVo7xQ',
@@ -18,7 +19,7 @@ twit = new twitter({
   access_token_secret: process.env['TWITTER_ACCESS_TOKEN_SECRET']
 })
 
-tweetCounts = TweetCountsFactory.create(2)
+tweetCounts = TweetCountsFactory.create(2, Graphite.initializeInHeroku())
 stream = new Stream(tweetCounts, twit, new TweetTokenizer(2))
 stream.start()
 

@@ -3,7 +3,7 @@ url = require('url')
 RedisTweetCounts = require('./RedisTweetCounts')
 
 class TweetCountsFactory
-  @create: (precision) ->
+  @create: (precision, graphite) ->
     if process.env.REDISCLOUD_URL?
       console.log("Using RedisCloud Redis")
       redisURL = url.parse(process.env.REDISCLOUD_URL)
@@ -13,6 +13,6 @@ class TweetCountsFactory
       console.log("Using Local Redis")
       client = redis.createClient()
 
-    new RedisTweetCounts(client, precision)
+    new RedisTweetCounts(client, precision, graphite)
 
 module.exports = TweetCountsFactory
