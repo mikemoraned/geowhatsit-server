@@ -17,7 +17,7 @@ class RedisTweetCounts
 
   collectMetrics: (collector) ->
     @redis.get("#{@version}.#{@precision}:count", (err, totalBuffer) =>
-      if !err?
+      if !err? and totalBuffer?
         total = parseInt(totalBuffer.toString())
         collector.send("tweets.total", total)
     )

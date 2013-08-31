@@ -17,7 +17,7 @@ class HostedGraphite
   constructor: (@apikey) ->
 
   send: (name, value) =>
-    message = new Buffer(@apikey + ".#{name} #{value}\n")
+    message = new Buffer("#{@apikey}.#{name} #{value}\n")
     client = dgram.createSocket("udp4")
     client.send(message, 0, message.length, 2003, "carbon.hostedgraphite.com", (err, bytes) ->
       client.close()
@@ -26,6 +26,7 @@ class HostedGraphite
 class Factory
   @initializeInHeroku: () ->
     apikey = process.env.HOSTEDGRAPHITE_APIKEY
+    console.log("api key: #{apikey}")
     if apikey?
       console.log("Using hosted graphite, api key: #{apikey}")
       new HostedGraphite(apikey)
