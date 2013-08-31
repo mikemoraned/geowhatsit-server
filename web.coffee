@@ -11,6 +11,7 @@ TweetCountsFactory = require("./lib/TweetCountsFactory")
 TweetTokenizer = require("./lib/TweetTokenizer")
 Stream = require("./lib/Stream")
 Graphite = require("./lib/Graphite")
+MetricCollector = require("./lib/MetricCollector")
 
 twit = new twitter({
   consumer_key: 'mCp0qZ0zGGcvA9ZKVo7xQ',
@@ -19,7 +20,12 @@ twit = new twitter({
   access_token_secret: process.env['TWITTER_ACCESS_TOKEN_SECRET']
 })
 
-tweetCounts = TweetCountsFactory.create(2, Graphite.initializeInHeroku())
+tweetCounts = TweetCountsFactory.create(2)
+
+collector = new MetricCollector(Graphite.initializeInHeroku(), [tweetCounts])
+collector.collect()
+collector.beginPolling(60 * 1000)
+
 stream = new Stream(tweetCounts, twit, new TweetTokenizer(2))
 stream.start()
 

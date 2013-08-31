@@ -1,7 +1,7 @@
 LatLon = require("./LatLon")
 
 class RedisTweetCounts
-  constructor: (@redis, @precision, @graphite) ->
+  constructor: (@redis, @precision) ->
     @version = "v3"
     @prefix = "#{@version}.geohash:#{@precision}:"
 
@@ -14,13 +14,12 @@ class RedisTweetCounts
       @redis.zincrby("#{@version}.ngrams:#{text.length}", 1, nGramId)
       @redis.hincrby(latLonId, nGramId, 1)
       @redis.hincrby(nGramId, latLonId, 1)
-    @reportStats()
 
-  reportStats: () ->
+  collectMetrics: (collector) ->
     @redis.get("#{@version}.#{@precision}:count", (err, totalBuffer) =>
       if !err?
         total = parseInt(totalBuffer.toString())
-        @graphite.send("total", total)
+        collector.send("tweets.total", total)
     )
 
   latLonFullId: (latLon) =>
