@@ -1,4 +1,5 @@
 dgram  = require('dgram')
+net = require('net')
 
 class LocalGraphite
   constructor: () ->
@@ -6,11 +7,11 @@ class LocalGraphite
 
   send: (name, value) =>
     timestamp = (new Date().getTime() / 1000).toFixed(0)
-    message = new Buffer("#{@appName}.#{name} #{value} #{timestamp}\n")
-#    console.log("#{message}")
-    client = dgram.createSocket("udp4")
-    client.send(message, 0, message.length, 2004, "localhost", (err, bytes) ->
-      client.close()
+    socket = net.createConnection(2003, "localhost", () =>
+      message = "#{@appName}.#{name} #{value} #{timestamp}\n"
+      console.log(message)
+      socket.write(message)
+      socket.end()
     )
 
 class HostedGraphite
@@ -26,7 +27,6 @@ class HostedGraphite
 class Factory
   @initializeInHeroku: () ->
     apikey = process.env.HOSTEDGRAPHITE_APIKEY
-    console.log("api key: #{apikey}")
     if apikey?
       console.log("Using hosted graphite, api key: #{apikey}")
       new HostedGraphite(apikey)
