@@ -35,9 +35,18 @@ app.get('/regions', (req, resp) ->
           center: region.center
           bbox: region.boundingBox()
         }
-        summary: result.summary
+        summary: result.summary,
+        ngrams: {
+          href: "/regions/#{region.hash}/ngrams"
+        }
       }
     resp.send(expanded)
+  )
+)
+
+app.get('/regions/:geohash/ngrams', (req, resp) ->
+  tweetCounts.ngramCountsForRegion(req.params.geohash, (results) ->
+    resp.send(results)
   )
 )
 

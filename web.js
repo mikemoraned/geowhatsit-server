@@ -49,12 +49,21 @@
               center: region.center,
               bbox: region.boundingBox()
             },
-            summary: result.summary
+            summary: result.summary,
+            ngrams: {
+              href: "/regions/" + region.hash + "/ngrams"
+            }
           });
         }
         return _results;
       })();
       return resp.send(expanded);
+    });
+  });
+
+  app.get('/regions/:geohash/ngrams', function(req, resp) {
+    return tweetCounts.ngramCountsForRegion(req.params.geohash, function(results) {
+      return resp.send(results);
     });
   });
 
