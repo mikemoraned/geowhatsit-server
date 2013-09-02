@@ -2,7 +2,6 @@ express = require("express")
 app = express()
 app.use(express.logger())
 
-twitter = require('twitter')
 _ = require('underscore')
 geohash = require('ngeohash')
 
@@ -12,13 +11,7 @@ TweetTokenizer = require("./lib/TweetTokenizer")
 Stream = require("./lib/Stream")
 Graphite = require("./lib/Graphite")
 MetricCollector = require("./lib/MetricCollector")
-
-twit = new twitter({
-  consumer_key: 'mCp0qZ0zGGcvA9ZKVo7xQ',
-  consumer_secret: 'X1Z4FaK8Hv68ZoTUCmiRjDy6IP5d5n7OHYwC6es4A',
-  access_token_key: '11510772-MZIWUADlvY7A9Cbz6kKpqbuRM7EfWrdskAnXNpxpE',
-  access_token_secret: process.env['TWITTER_ACCESS_TOKEN_SECRET']
-})
+TwitterAccess = require('./lib/TwitterAccess')
 
 tweetCounts = TweetCountsFactory.create(2)
 
@@ -26,7 +19,7 @@ collector = new MetricCollector(Graphite.initializeInHeroku(), [tweetCounts])
 collector.collect()
 collector.beginPolling(60 * 1000)
 
-stream = new Stream(tweetCounts, twit, new TweetTokenizer(2))
+stream = new Stream(tweetCounts, TwitterAccess.init(), new TweetTokenizer(2))
 stream.start()
 
 app.all('*', (req, resp, next) ->

@@ -4,7 +4,7 @@ class MetricCollector
 
   beginPolling: (interval) =>
     console.log("Will collect metrics every #{interval} millis")
-    setTimeout(@collect, interval)
+    setInterval(@collect, interval)
 
   collect: =>
     for collectable in @collectables
