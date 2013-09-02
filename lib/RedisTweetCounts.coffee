@@ -1,4 +1,5 @@
 LatLon = require("./LatLon")
+GeoHashRegion = require("./GeoHashRegion")
 
 class RedisTweetCounts
   constructor: (@redis, @precision) ->
@@ -7,13 +8,13 @@ class RedisTweetCounts
 
   add: (latLon, text) ->
     @redis.incr("#{@version}.#{@precision}:count")
-    latLonId = @latLonFullId(latLon)
-    @redis.zincrby("#{@version}.geohashes:#{@precision}", 1, latLonId)
+    fullGeoHashId = @fullGeoHashId(latLon)
+    @redis.zincrby("#{@version}.geohashes:#{@precision}", 1, fullGeoHashId)
     for nGram in text.nGrams
       nGramId = "#{@version}.ngram:#{text.length}:#{nGram}"
       @redis.zincrby("#{@version}.ngrams:#{text.length}", 1, nGramId)
-      @redis.hincrby(latLonId, nGramId, 1)
-      @redis.hincrby(nGramId, latLonId, 1)
+      @redis.hincrby(fullGeoHashId, nGramId, 1)
+      @redis.hincrby(nGramId, fullGeoHashId, 1)
 
   collectMetrics: (collector) ->
     @redis.get("#{@version}.#{@precision}:count", (err, totalBuffer) =>
@@ -22,15 +23,23 @@ class RedisTweetCounts
         collector.send("tweets.total", total)
     )
 
-  latLonFullId: (latLon) =>
-    "#{@prefix}#{latLon.toGeoHash(@precision)}"
+  fullGeoHashId: (latLon) =>
+    "#{@prefix}#{GeoHashRegion.fromPointInRegion(latLon, @precision)}"
 
-  regions: (callback) =>
+  summariseRegions: (callback) =>
     @redis.zrange(["#{@version}.geohashes:#{@precision}", 0, -1], (err, response) =>
       geohashes = for keyIndex in [0 ... response.length]
         fullId = response[keyIndex]
         fullId.toString().substring(@prefix.length)
-      callback(geohashes)
+      withSummaries = for geohash in geohashes
+        region = GeoHashRegion.fromHash(geohash)
+        {
+          name: geohash,
+          geo: {
+            center: region.center
+          }
+        }
+      callback(withSummaries)
     )
 
   dump: (callback) ->
@@ -50,7 +59,7 @@ class RedisTweetCounts
             fullId = response[keyIndex]
             geoHash = fullId.toString().substring(@prefix.length)
             count = parseInt(response[keyIndex + 1].toString())
-            entry = { lat_lon: LatLon.fromGeoHash(geoHash), count: count }
+            entry = { lat_lon: GeoHashRegion.fromHash(geoHash).center, count: count }
             counts.push(entry)
           callback({
             'total'  : total,

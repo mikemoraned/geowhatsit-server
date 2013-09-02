@@ -35,7 +35,7 @@
   });
 
   app.get('/regions', function(req, resp) {
-    return tweetCounts.regions(function(regionSummaries) {
+    return tweetCounts.summariseRegions(function(regionSummaries) {
       return resp.send(regionSummaries);
     });
   });

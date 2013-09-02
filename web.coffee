@@ -26,7 +26,7 @@ app.get('/counts.json', (req, resp) ->
 )
 
 app.get('/regions', (req, resp) ->
-  tweetCounts.regions((regionSummaries) ->
+  tweetCounts.summariseRegions((regionSummaries) ->
     resp.send(regionSummaries)
   )
 )
