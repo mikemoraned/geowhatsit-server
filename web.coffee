@@ -26,8 +26,18 @@ app.get('/counts.json', (req, resp) ->
 )
 
 app.get('/regions', (req, resp) ->
-  tweetCounts.summariseRegions((regionSummaries) ->
-    resp.send(regionSummaries)
+  tweetCounts.summariseRegions((results) ->
+    expanded = for result in results
+      region = result.region
+      {
+        name: region.hash
+        geo: {
+          center: region.center
+          bbox: region.boundingBox()
+        }
+        summary: result.summary
+      }
+    resp.send(expanded)
   )
 )
 

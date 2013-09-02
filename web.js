@@ -35,8 +35,26 @@
   });
 
   app.get('/regions', function(req, resp) {
-    return tweetCounts.summariseRegions(function(regionSummaries) {
-      return resp.send(regionSummaries);
+    return tweetCounts.summariseRegions(function(results) {
+      var expanded, region, result;
+      expanded = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = results.length; _i < _len; _i++) {
+          result = results[_i];
+          region = result.region;
+          _results.push({
+            name: region.hash,
+            geo: {
+              center: region.center,
+              bbox: region.boundingBox()
+            },
+            summary: result.summary
+          });
+        }
+        return _results;
+      })();
+      return resp.send(expanded);
     });
   });
 

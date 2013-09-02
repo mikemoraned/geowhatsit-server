@@ -27,20 +27,27 @@ class RedisTweetCounts
     "#{@prefix}#{GeoHashRegion.fromPointInRegion(latLon, @precision)}"
 
   summariseRegions: (callback) =>
-    @redis.zrange(["#{@version}.geohashes:#{@precision}", 0, -1], (err, response) =>
-      geohashes = for keyIndex in [0 ... response.length]
-        fullId = response[keyIndex]
-        fullId.toString().substring(@prefix.length)
-      withSummaries = for geohash in geohashes
-        region = GeoHashRegion.fromHash(geohash)
+    @tweetCountsPerRegion((results) =>
+      withSummaries = for result in results
         {
-          name: geohash,
-          geo: {
-            center: region.center,
-            bbox: region.boundingBox()
+          region: result.region,
+          summary: {
+            tweets: result.tweets
           }
         }
       callback(withSummaries)
+    )
+
+  tweetCountsPerRegion: (callback) =>
+    @redis.zrevrange(["#{@version}.geohashes:#{@precision}", 0, -1, 'withscores'], (err, response) =>
+      results = []
+      for keyIndex in [0 ... response.length] by 2
+        fullId = response[keyIndex]
+        geoHash = fullId.toString().substring(@prefix.length)
+        count = parseInt(response[keyIndex + 1].toString())
+        result = { region: GeoHashRegion.fromHash(geoHash), tweets: count }
+        results.push(result)
+      callback(results)
     )
 
   dump: (callback) ->

@@ -33,6 +33,23 @@
         assert.equal(57.64911, region.center.latitude.toFixed(5));
         return assert.equal(10.40744, region.center.longitude.toFixed(5));
       }
+    },
+    'when created from known geohash': {
+      topic: GeoHashRegion.fromHash("qq"),
+      'can determine bounding box': function(region) {
+        var bb;
+        bb = region.boundingBox();
+        assert.equal(-5.625, bb.topLeft.latitude.toFixed(3));
+        assert.equal(101.25, bb.topLeft.longitude.toFixed(2));
+        assert.equal(-11.25, bb.bottomRight.latitude.toFixed(2));
+        return assert.equal(112.5, bb.bottomRight.longitude.toFixed(2));
+      },
+      'can determine center': function(region) {
+        var center;
+        center = region.center;
+        assert.equal(-8.4375, center.latitude.toFixed(4));
+        return assert.equal(106.875, center.longitude.toFixed(3));
+      }
     }
   })["export"](module);
 
