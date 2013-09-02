@@ -25,6 +25,14 @@ class RedisTweetCounts
   latLonFullId: (latLon) =>
     "#{@prefix}#{latLon.toGeoHash(@precision)}"
 
+  regions: (callback) =>
+    @redis.zrange(["#{@version}.geohashes:#{@precision}", 0, -1], (err, response) =>
+      geohashes = for keyIndex in [0 ... response.length]
+        fullId = response[keyIndex]
+        fullId.toString().substring(@prefix.length)
+      callback(geohashes)
+    )
+
   dump: (callback) ->
     @redis.get("#{@version}.#{@precision}:count", (err, totalBuffer) =>
       if err?

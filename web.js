@@ -34,6 +34,12 @@
     });
   });
 
+  app.get('/regions', function(req, resp) {
+    return tweetCounts.regions(function(regionSummaries) {
+      return resp.send(regionSummaries);
+    });
+  });
+
   app.get('/counts/grouped-by-geohash/precision-:precision.json', function(req, resp) {
     return tweetCounts.dump(function(dumped) {
       var byGeoHash, counts;

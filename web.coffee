@@ -25,6 +25,12 @@ app.get('/counts.json', (req, resp) ->
   )
 )
 
+app.get('/regions', (req, resp) ->
+  tweetCounts.regions((regionSummaries) ->
+    resp.send(regionSummaries)
+  )
+)
+
 app.get('/counts/grouped-by-geohash/precision-:precision.json', (req, resp) ->
   tweetCounts.dump((dumped) ->
     byGeoHash = _.countBy(dumped.counts, (entry) ->
@@ -38,7 +44,6 @@ app.get('/counts/grouped-by-geohash/precision-:precision.json', (req, resp) ->
     resp.send({ 'total' : dumped.total, 'counts': counts })
   )
 )
-
 
 port = process.env.PORT || 5000
 app.listen(port, () ->
