@@ -36,7 +36,8 @@ class RedisTweetCounts
         {
           name: geohash,
           geo: {
-            center: region.center
+            center: region.center,
+            bbox: region.boundingBox()
           }
         }
       callback(withSummaries)
