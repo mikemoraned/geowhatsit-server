@@ -11,9 +11,10 @@ class SurprisingNGrams
         forRegionSum = @sumNGrams(forRegion)
         forRegionMap = @toMap(forRegion)
 
-        console.dir(overallSum)
-        console.dir(overallMap)
-        console.dir(forRegionSum)
+#        console.dir(overallSum)
+#        console.dir(overallMap)
+#        console.dir(forRegionSum)
+#        console.dir(forRegionMap)
 
         surpriseFn = (d) =>
           overallRatio = overallMap[d.ngram] / overallSum
@@ -32,7 +33,13 @@ class SurprisingNGrams
       )
     )
 
-  sumNGrams: (d) -> _.chain(d).pluck("ngram").reduce(((m, d) -> m + parseInt(d)), 0).value()
-  toMap: (d) -> _.chain(d).reduce(((m, d) -> m[d.ngram] = d.tweets), {}).value()
+  sumNGrams: (d) -> _.chain(d).pluck("tweets").reduce(((m, d) -> m + d), 0).value()
+  toMap: (d) ->
+    _.chain(d)
+      .reduce(((m, d) ->
+        m[d.ngram] = d.tweets
+        m
+      ), {})
+      .value()
 
 module.exports = SurprisingNGrams
