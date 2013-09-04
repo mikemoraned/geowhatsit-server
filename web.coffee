@@ -8,9 +8,11 @@ geohash = require('ngeohash')
 LatLon = require("./lib/LatLon")
 TweetCountsFactory = require("./lib/TweetCountsFactory")
 SurprisingNGrams = require("./lib/SurprisingNGrams")
+TFIDF = require("./lib/TFIDF")
 
 tweetCounts = TweetCountsFactory.create(2)
 surprising = new SurprisingNGrams(tweetCounts)
+tfidf = new TFIDF(tweetCounts)
 
 app.all('*', (req, resp, next) ->
   resp.header("Access-Control-Allow-Origin", "*")
@@ -53,6 +55,18 @@ app.get('/regions/:geohash/ngrams', (req, resp) ->
 )
 
 app.get('/regions/:geohash/ngrams/surprising', (req, resp) ->
+  surprising.surprisingNGramsForRegion(req.params.geohash, (results) ->
+    resp.send(results)
+  )
+)
+
+app.get('/regions/:geohash/ngrams/tfidf', (req, resp) ->
+  tfidf.ngramsForRegionOrderedByScore(req.params.geohash, (results) ->
+    resp.send(results)
+  )
+)
+
+app.get('/regions/:geohash/ngrams/tfidf', (req, resp) ->
   surprising.surprisingNGramsForRegion(req.params.geohash, (results) ->
     resp.send(results)
   )

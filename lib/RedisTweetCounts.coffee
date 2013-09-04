@@ -55,11 +55,22 @@ class RedisTweetCounts
     @redis.hgetall("#{@prefix}#{geoHash}", (err, response) =>
       results = []
       for fullNGramId, value of response
-        ngram = fullNGramId.toString().substring("#{@version}.ngram:".length)
+        ngram = fullNGramId.toString().substring("#{@version}.ngram:2:".length)
         count = parseInt(value.toString())
         result = { ngram: ngram, tweets: count }
         results.push(result)
       callback(_.sortBy(results, (d) -> -1 * d.tweets))
+    )
+
+  countRegionsInWhichNGramOccurs: (nGram, callback) =>
+    @redis.hlen("#{@version}.ngram:#{nGram.length}:#{nGram}", (err, result) =>
+#      console.dir(result)
+      callback({ ngram: nGram, regions: parseInt(result) })
+    )
+
+  countRegions: (callback) =>
+    @redis.zcard("#{@version}.geohashes:#{@precision}", (err, result) =>
+      callback(parseInt(result))
     )
 
   overallNGramCounts: (callback) =>
