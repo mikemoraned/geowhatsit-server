@@ -22,6 +22,10 @@ class RedisTweetCounts
       if !err? and totalBuffer?
         total = parseInt(totalBuffer.toString())
         collector.send("tweets.total", total)
+      @summariseRegions((results) =>
+        for result in results
+          collector.send("tweets.#{result.region.hash}.total", result.summary.tweets)
+      )
     )
 
   fullGeoHashId: (latLon) =>
@@ -60,6 +64,18 @@ class RedisTweetCounts
         result = { ngram: ngram, tweets: count }
         results.push(result)
       callback(_.sortBy(results, (d) -> -1 * d.tweets))
+    )
+
+  overallNGramCounts: (callback) =>
+    @redis.zrevrange(["#{@version}.ngrams:2", 0, -1, 'withscores'], (err, response) =>
+      results = []
+      for keyIndex in [0 ... response.length] by 2
+        fullId = response[keyIndex]
+        ngram = fullId.toString().substring("#{@version}.ngram:".length)
+        count = parseInt(response[keyIndex + 1].toString())
+        result = { ngram: ngram, tweets: count }
+        results.push(result)
+      callback(results)
     )
 
   dump: (callback) ->

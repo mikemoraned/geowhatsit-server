@@ -1,4 +1,3 @@
-
 class MetricCollector
   constructor: (@graphite, @collectables) ->
 

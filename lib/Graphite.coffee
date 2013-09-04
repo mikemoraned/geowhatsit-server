@@ -7,12 +7,20 @@ class LocalGraphite
 
   send: (name, value) =>
     timestamp = (new Date().getTime() / 1000).toFixed(0)
-    socket = net.createConnection(2003, "localhost", () =>
-      message = "#{@appName}.#{name} #{value} #{timestamp}\n"
-      console.log(message)
-      socket.write(message)
-      socket.end()
+    message = "#{@appName}.#{name} #{value} #{timestamp}"
+
+    stream = new net.Stream()
+    stream.addListener('connect', () =>
+#      console.log("Connected")
+#      console.log(message)
+      stream.write(message)
+      stream.write("\n")
+      stream.end()
     )
+    stream.addListener('error', (e) =>
+      console.log("Dropped \"#{message}\": #{e}")
+    )
+    stream.connect(2003, "localhost")
 
 class HostedGraphite
   constructor: (@apikey) ->
