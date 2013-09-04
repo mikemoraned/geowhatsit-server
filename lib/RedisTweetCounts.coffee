@@ -22,10 +22,6 @@ class RedisTweetCounts
       if !err? and totalBuffer?
         total = parseInt(totalBuffer.toString())
         collector.send("tweets.total", total)
-      @summariseRegions((results) =>
-        for result in results
-          collector.send("tweets.#{result.region.hash}.total", result.summary.tweets)
-      )
     )
 
   fullGeoHashId: (latLon) =>
