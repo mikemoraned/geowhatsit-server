@@ -60,6 +60,11 @@
             summary: result.summary,
             ngrams: {
               href: "/regions/" + region.hash + "/ngrams"
+            },
+            hrefs: {
+              ngrams: "/regions/" + region.hash + "/ngrams",
+              surprising: "/regions/" + region.hash + "/ngrams/surprising",
+              tfidf: "/regions/" + region.hash + "/ngrams/tfidf"
             }
           });
         }
