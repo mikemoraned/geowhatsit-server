@@ -10,6 +10,7 @@ class NearestRegionFinder
           .sortBy((d) -> -1 * d.tweets)
           .first(limit)
           .pluck("region")
+          .filter((d) -> d.hash != "[object Object]") # remove some guff (a hack)
           .value())
     )
 

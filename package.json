@@ -11,7 +11,8 @@
     "underscore": "~1.5.1",
     "redis": "~0.8.4",
     "natural": "~0.1.21",
-    "urlencode": "0.0.1"
+    "urlencode": "0.0.1",
+    "request": "~2.27.0"
   },
   "devDependencies": {
     "vows": "0.7.x"
