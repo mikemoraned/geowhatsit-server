@@ -11,10 +11,12 @@ TweetCountsFactory = require("./lib/TweetCountsFactory")
 SurprisingNGrams = require("./lib/SurprisingNGrams")
 TFIDF = require("./lib/TFIDF")
 PhraseSignature = require("./lib/PhraseSignature")
+NearestRegionFinder = require("./lib/NearestRegionFinder")
 
 ngramLength = 2
 tweetCounts = TweetCountsFactory.create(ngramLength)
 surprising = new SurprisingNGrams(tweetCounts)
+regionFinder = new NearestRegionFinder(tweetCounts)
 tfidf = new TFIDF(tweetCounts)
 
 app.all('*', (req, resp, next) ->
@@ -102,10 +104,13 @@ app.get('/phrases/:sig', (req, resp) ->
   hrefsForNGrams = {}
   for nGram in sig.toNGrams()
     hrefsForNGrams[nGram] = "/ngrams/#{nGram}"
-  resp.send({
-    signature: sig.toSignature()
-    nGrams: hrefsForNGrams
-  })
+  regionFinder.nearest(sig, 10, (nearest) ->
+    resp.send({
+      signature: sig.toSignature()
+      nGrams: hrefsForNGrams
+      nearest: "/regions/#{region.hash}" for region in nearest
+    })
+  )
 )
 
 app.get('/ngrams', (req, resp) ->
