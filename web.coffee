@@ -1,6 +1,7 @@
 express = require("express")
 app = express()
 app.use(express.logger())
+app.use(express.bodyParser())
 
 _ = require('underscore')
 geohash = require('ngeohash')
@@ -9,8 +10,10 @@ LatLon = require("./lib/LatLon")
 TweetCountsFactory = require("./lib/TweetCountsFactory")
 SurprisingNGrams = require("./lib/SurprisingNGrams")
 TFIDF = require("./lib/TFIDF")
+PhraseSignature = require("./lib/PhraseSignature")
 
-tweetCounts = TweetCountsFactory.create(2)
+ngramLength = 2
+tweetCounts = TweetCountsFactory.create(ngramLength)
 surprising = new SurprisingNGrams(tweetCounts)
 tfidf = new TFIDF(tweetCounts)
 
@@ -71,10 +74,32 @@ app.get('/regions/:geohash/ngrams/tfidf', (req, resp) ->
   )
 )
 
-app.get('/regions/:geohash/ngrams/tfidf', (req, resp) ->
-  surprising.surprisingNGramsForRegion(req.params.geohash, (results) ->
-    resp.send(results)
-  )
+app.get('/signature', (req, resp) ->
+  resp.send('''
+            <!doctype html>
+            <html lang=en>
+            <meta charset=utf-8>
+            <title>enter phrase</title>
+            <p>enter phrase:</p>
+            <form method="POST" >
+              <textarea name="phrase[text]"></textarea>
+              <input type="submit"/>
+            </form>
+            ''')
+)
+
+app.post('/signature', (req, resp) ->
+  phrase = req.body.phrase.text
+  if phrase?
+    sig = PhraseSignature.fromPhrase(phrase, ngramLength).toSignature()
+    resp.redirect("/signature/#{sig}")
+  else
+    resp.send(422, "missing phrase from body")
+)
+
+app.get('/signature/:sig', (req, resp) ->
+  sig = PhraseSignature.fromSignature(req.params.sig)
+  resp.send(sig.toNGrams())
 )
 
 app.get('/ngrams', (req, resp) ->

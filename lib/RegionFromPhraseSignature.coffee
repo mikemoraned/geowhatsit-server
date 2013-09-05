@@ -1,0 +1,3 @@
+class RegionFromPhraseSignature
+
+module.exports = RegionFromPhraseSignature
