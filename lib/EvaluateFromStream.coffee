@@ -30,20 +30,29 @@ class EvaluateFromStream extends Stream
 
         request(locationURL, (error, response, body) =>
           if !error && response.statusCode == 200
-            expectedRegionURL = url.resolve(locationURL, JSON.parse(body).region)
-            request(phraseURL, (error, response, body) =>
-              if !error && response.statusCode == 200
-                @incStat("evaluated")
-                nearestRegionURL = url.resolve(phraseURL, JSON.parse(body).nearest[0])
-                correct = expectedRegionURL == nearestRegionURL
-                console.log("#{expectedRegionURL},#{nearestRegionURL},#{correct}")
-                if correct
-                  @incStat("correct")
-            )
+            try
+              expectedRegionURL = url.resolve(locationURL, JSON.parse(body).region)
+              request(phraseURL, (error, response, body) =>
+                if !error && response.statusCode == 200
+                  try
+                    nearestRegionURL = url.resolve(phraseURL, JSON.parse(body).nearest[0])
+                    correct = expectedRegionURL == nearestRegionURL
+                    @incStat("evaluated")
+                    console.log("#{expectedRegionURL},#{nearestRegionURL},#{correct}")
+                    if correct
+                      @incStat("correct")
+                  catch e
+                    @ignoreTweetOnError(e, data)
+              )
+            catch e
+              @ignoreTweetOnError(e, data)
         )
       catch e
-        console.dir(e)
-        console.dir("ignoring tweet: https://twitter.com/#{data.user.screen_name}/status/#{data.id_str}, text: \"" + data.text + "\"")
+        @ignoreTweetOnError(e, data)
+
+  ignoreTweetOnError: (e, data) =>
+    console.dir(e)
+    console.dir("ignoring tweet: https://twitter.com/#{data.user.screen_name}/status/#{data.id_str}, text: \"" + data.text + "\"")
 
   incStat: (name) =>
     @stats[name] = @stats[name] + 1
