@@ -16,11 +16,6 @@ class EvaluateFromStream extends Stream
       correct: 0
     }
 
-  start: () =>
-    super
-    @dumpStats()
-    setInterval(@dumpStats, 10 * 1000)
-
   handleData: (data) =>
     @incStat("seen")
     if data.geo? and data.geo.coordinates?
@@ -55,5 +50,10 @@ class EvaluateFromStream extends Stream
 
   dumpStats: () =>
     console.dir(@stats)
+
+  collectMetrics: (collector) =>
+    @dumpStats()
+    for key, value of @stats
+      collector.send("evaluate.#{key}", value)
 
 module.exports = EvaluateFromStream
