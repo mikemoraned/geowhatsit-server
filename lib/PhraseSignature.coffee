@@ -16,10 +16,10 @@ class PhraseSignature
     new PhraseSignature(sortedNGrams)
 
   @fromSignature: (sig) ->
-    new PhraseSignature(_.sortBy(sig.split(","), (d) -> d))
+    new PhraseSignature(_.sortBy(sig.split(/\-/), (d) -> d))
 
   toSignature: () ->
-    @sortedNGrams.join(",")
+    @sortedNGrams.join('-')
 
   toNGrams: () ->
     @sortedNGrams

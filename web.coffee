@@ -7,9 +7,12 @@ _ = require('underscore')
 geohash = require('ngeohash')
 
 LatLon = require("./lib/LatLon")
+GeoHashRegion = require("./lib/GeoHashRegion")
+
 TweetCountsFactory = require("./lib/TweetCountsFactory")
 SurprisingNGrams = require("./lib/SurprisingNGrams")
 TFIDF = require("./lib/TFIDF")
+
 PhraseSignature = require("./lib/PhraseSignature")
 NearestRegionFinder = require("./lib/NearestRegionFinder")
 
@@ -32,6 +35,15 @@ app.get('/counts.json', (req, resp) ->
   tweetCounts.dump((dumped) ->
     resp.send(dumped)
   )
+)
+
+app.get('/locations/:lat,:lon', (req, resp) ->
+  location = new LatLon(parseFloat(req.params.lat),parseFloat(req.params.lon))
+  region = GeoHashRegion.fromPointInRegion(location,2)
+  resp.send({
+    location: location
+    region: "/regions/#{region.hash}"
+  })
 )
 
 app.get('/regions', (req, resp) ->

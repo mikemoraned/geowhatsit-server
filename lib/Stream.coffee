@@ -1,7 +1,5 @@
-LatLon = require("./LatLon.js")
-
 class Stream
-  constructor: (@tweetCounts, @twitter, @tokenizer, restartAfterSeconds = 30 * 60) ->
+  constructor: (@twitter, restartAfterSeconds = 30 * 60) ->
     @restartAfterMillis = restartAfterSeconds * 1000
 
   start: () ->
@@ -17,9 +15,5 @@ class Stream
       console.log("Destroying stream")
       @stream.destroy()
     @start()
-
-  handleData: (data) =>
-    if data.geo? and data.geo.coordinates?
-      @tweetCounts.add(new LatLon(data.geo.coordinates[0], data.geo.coordinates[1]), @tokenizer.nGrams(data.text))
 
 module.exports = Stream
