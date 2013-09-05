@@ -98,30 +98,50 @@
     });
   });
 
-  app.get('/signature', function(req, resp) {
+  app.get('/phrases', function(req, resp) {
     return resp.send('<!doctype html>\n<html lang=en>\n<meta charset=utf-8>\n<title>enter phrase</title>\n<p>enter phrase:</p>\n<form method="POST" >\n  <textarea name="phrase[text]"></textarea>\n  <input type="submit"/>\n</form>');
   });
 
-  app.post('/signature', function(req, resp) {
+  app.post('/phrases', function(req, resp) {
     var phrase, sig;
     phrase = req.body.phrase.text;
     if (phrase != null) {
       sig = PhraseSignature.fromPhrase(phrase, ngramLength).toSignature();
-      return resp.redirect("/signature/" + sig);
+      return resp.redirect("/phrase/" + sig);
     } else {
-      return resp.send(422, "missing phrase from body");
+      return resp.send(422, "missing text from body");
     }
   });
 
-  app.get('/signature/:sig', function(req, resp) {
-    var sig;
+  app.get('/phrases/:sig', function(req, resp) {
+    var hrefsForNGrams, nGram, sig, _i, _len, _ref;
     sig = PhraseSignature.fromSignature(req.params.sig);
-    return resp.send(sig.toNGrams());
+    hrefsForNGrams = {};
+    _ref = sig.toNGrams();
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      nGram = _ref[_i];
+      hrefsForNGrams[nGram] = "/ngrams/" + nGram;
+    }
+    return resp.send({
+      signature: sig.toSignature(),
+      nGrams: hrefsForNGrams
+    });
   });
 
   app.get('/ngrams', function(req, resp) {
     return tweetCounts.overallNGramCounts(function(results) {
       return resp.send(results);
+    });
+  });
+
+  app.get('/ngrams/:ngram', function(req, resp) {
+    return tweetCounts.countRegionsInWhichNGramOccurs(req.params.ngram, function(result) {
+      return resp.send({
+        nGram: result.ngram,
+        regions: {
+          count: result.regions
+        }
+      });
     });
   });
 

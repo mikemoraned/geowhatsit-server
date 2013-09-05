@@ -74,7 +74,7 @@ app.get('/regions/:geohash/ngrams/tfidf', (req, resp) ->
   )
 )
 
-app.get('/signature', (req, resp) ->
+app.get('/phrases', (req, resp) ->
   resp.send('''
             <!doctype html>
             <html lang=en>
@@ -88,23 +88,40 @@ app.get('/signature', (req, resp) ->
             ''')
 )
 
-app.post('/signature', (req, resp) ->
+app.post('/phrases', (req, resp) ->
   phrase = req.body.phrase.text
   if phrase?
     sig = PhraseSignature.fromPhrase(phrase, ngramLength).toSignature()
-    resp.redirect("/signature/#{sig}")
+    resp.redirect("/phrase/#{sig}")
   else
-    resp.send(422, "missing phrase from body")
+    resp.send(422, "missing text from body")
 )
 
-app.get('/signature/:sig', (req, resp) ->
+app.get('/phrases/:sig', (req, resp) ->
   sig = PhraseSignature.fromSignature(req.params.sig)
-  resp.send(sig.toNGrams())
+  hrefsForNGrams = {}
+  for nGram in sig.toNGrams()
+    hrefsForNGrams[nGram] = "/ngrams/#{nGram}"
+  resp.send({
+    signature: sig.toSignature()
+    nGrams: hrefsForNGrams
+  })
 )
 
 app.get('/ngrams', (req, resp) ->
   tweetCounts.overallNGramCounts((results) ->
     resp.send(results)
+  )
+)
+
+app.get('/ngrams/:ngram', (req, resp) ->
+  tweetCounts.countRegionsInWhichNGramOccurs(req.params.ngram, (result) ->
+    resp.send({
+      nGram: result.ngram
+      regions: {
+        count: result.regions
+      }
+    })
   )
 )
 
