@@ -31,16 +31,18 @@ class EvaluateFromStream extends Stream
         request(locationURL, (error, response, body) =>
           if !error && response.statusCode == 200
             try
-              expectedRegionURL = url.resolve(locationURL, JSON.parse(body).region)
+              expectedRegion = JSON.parse(body).region
               request(phraseURL, (error, response, body) =>
                 if !error && response.statusCode == 200
                   try
-                    nearestRegionURL = url.resolve(phraseURL, JSON.parse(body).nearest[0])
-                    correct = expectedRegionURL == nearestRegionURL
-                    @incStat("evaluated")
-                    console.log("#{expectedRegionURL},#{nearestRegionURL},#{correct}")
-                    if correct
-                      @incStat("correct")
+                    nearest = JSON.parse(body).nearest
+                    if nearest?
+                      top = nearest[0]
+                      correct = expectedRegion.name == top.name
+                      @incStat("evaluated")
+                      console.log("#{expectedRegion.name},#{top.name},#{correct}")
+                      if correct
+                        @incStat("correct")
                   catch e
                     @ignoreTweetOnError(e, data)
               )

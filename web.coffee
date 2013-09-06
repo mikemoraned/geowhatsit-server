@@ -42,31 +42,44 @@ app.get('/locations/:lat,:lon', (req, resp) ->
   region = GeoHashRegion.fromPointInRegion(location,2)
   resp.send({
     location: location
-    region: "/regions/#{region.hash}"
+    region: {
+      name: region.hash
+      href: "/regions/#{region.hash}"
+    }
   })
 )
 
+expandSummary = (result) ->
+  region = result.region
+  {
+    name: region.hash
+    geo: {
+      center: region.center
+      bbox: region.boundingBox()
+    }
+    summary: result.summary,
+    ngrams: {
+      href: "/regions/#{region.hash}/ngrams"
+    },
+    hrefs: {
+      ngrams: "/regions/#{region.hash}/ngrams",
+      surprising: "/regions/#{region.hash}/ngrams/surprising"
+      tfidf: "/regions/#{region.hash}/ngrams/tfidf"
+    }
+  }
+
 app.get('/regions', (req, resp) ->
   tweetCounts.summariseRegions((results) ->
-    expanded = for result in results
-      region = result.region
-      {
-        name: region.hash
-        geo: {
-          center: region.center
-          bbox: region.boundingBox()
-        }
-        summary: result.summary,
-        ngrams: {
-          href: "/regions/#{region.hash}/ngrams"
-        },
-        hrefs: {
-          ngrams: "/regions/#{region.hash}/ngrams",
-          surprising: "/regions/#{region.hash}/ngrams/surprising"
-          tfidf: "/regions/#{region.hash}/ngrams/tfidf"
-        }
-      }
-    resp.send(expanded)
+    resp.send(expandSummary(result) for result in results)
+  )
+)
+
+app.get('/regions/:geohash', (req, resp) ->
+  tweetCounts.summariseRegion(req.params.geohash, (result) ->
+    if result?
+      resp.send(expandSummary(result))
+    else
+      resp.send(404)
   )
 )
 
@@ -116,11 +129,16 @@ app.get('/phrases/:sig', (req, resp) ->
   hrefsForNGrams = {}
   for nGram in sig.toNGrams()
     hrefsForNGrams[nGram] = "/ngrams/#{nGram}"
-  regionFinder.nearest(sig, 10, (nearest) ->
+  regionFinder.nearest(sig, 10, (nearestRegions) ->
+    nearest = for region in nearestRegions
+      {
+        name: region.hash
+        href: "/regions/#{region.hash}"
+      }
     resp.send({
       signature: sig.toSignature()
       nGrams: hrefsForNGrams
-      nearest: "/regions/#{region.hash}" for region in nearest
+      nearest: nearest
     })
   )
 )
@@ -139,20 +157,6 @@ app.get('/ngrams/:ngram', (req, resp) ->
         count: result.regions
       }
     })
-  )
-)
-
-app.get('/counts/grouped-by-geohash/precision-:precision.json', (req, resp) ->
-  tweetCounts.dump((dumped) ->
-    byGeoHash = _.countBy(dumped.counts, (entry) ->
-      geohash.encode(entry.lat_lon.latitude, entry.lat_lon.longitude, req.params.precision)
-    )
-    counts = _.map(byGeoHash, (count, encoded) ->
-      {
-      'lat_lon' : geohash.decode(encoded),
-      'count'   : count
-      })
-    resp.send({ 'total' : dumped.total, 'counts': counts })
   )
 )
 

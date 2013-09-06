@@ -39,6 +39,15 @@ class RedisTweetCounts
       callback(withSummaries)
     )
 
+  summariseRegion: (geoHash, callback) =>
+    @summariseRegions((results) =>
+      filtered = _.chain(results).filter((d) -> d.region.hash == geoHash).value()
+      if filtered.length == 1
+        callback(filtered[0])
+      else
+        callback(null)
+    )
+
   tweetCountsPerRegion: (callback) =>
     @redis.zrevrange(["#{@version}.geohashes:#{@precision}", 0, -1, 'withscores'], (err, response) =>
       results = []
