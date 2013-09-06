@@ -9,6 +9,7 @@ PhraseSignature = require("./PhraseSignature")
 class EvaluateFromStream extends Stream
   constructor: (@baseURL, twitter, restartAfterSeconds) ->
     super(twitter, restartAfterSeconds)
+    @regionCounts = {}
     @stats = {
       seen: 0
       has_geo: 0
@@ -32,6 +33,7 @@ class EvaluateFromStream extends Stream
           if !error && response.statusCode == 200
             try
               expectedRegion = JSON.parse(body).region
+              @incRegionCounts(expectedRegion.name)
               request(phraseURL, (error, response, body) =>
                 if !error && response.statusCode == 200
                   try
@@ -59,12 +61,21 @@ class EvaluateFromStream extends Stream
   incStat: (name) =>
     @stats[name] = @stats[name] + 1
 
+  incRegionCounts: (name) =>
+    if @regionCounts[name]?
+      @regionCounts[name] = @regionCounts[name] + 1
+    else
+      @regionCounts[name] = 1
+
   dumpStats: () =>
     console.dir(@stats)
+    console.dir(@regionCounts)
 
   collectMetrics: (collector) =>
     @dumpStats()
     for key, value of @stats
       collector.send("evaluate.#{key}", value)
+#    for key, value of @regionCounts
+#      collector.send("evaluate.region.has_geo.#{key}", value)
 
 module.exports = EvaluateFromStream
