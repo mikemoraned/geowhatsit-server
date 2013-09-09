@@ -69,7 +69,7 @@ class EvaluateFromStream extends Stream
 
   dumpStats: () =>
     console.dir(@stats)
-    console.dir(@regionCounts)
+#    console.dir(@regionCounts)
 
   collectMetrics: (collector) =>
     @dumpStats()
