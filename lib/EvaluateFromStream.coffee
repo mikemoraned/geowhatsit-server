@@ -39,11 +39,16 @@ class EvaluateFromStream extends Stream
                   try
                     nearest = JSON.parse(body).nearest
                     if nearest?
-                      top = nearest[0]
-                      correct = expectedRegion.name == top.name
                       @incStat("evaluated")
-                      console.log("#{expectedRegion.name},#{top.name},#{correct}")
-                      if correct
+                      some_correct = false
+                      for algorithm, results of nearest
+                        top = results[0]
+                        correct = expectedRegion.name == top.name
+                        some_correct = correct || some_correct
+                        console.log("#{expectedRegion.name},#{top.name},#{correct}")
+                        if correct
+                          @incStat("algorithm.#{algorithm}.correct")
+                      if some_correct
                         @incStat("correct")
                   catch e
                     @ignoreTweetOnError(e, data)
@@ -59,7 +64,10 @@ class EvaluateFromStream extends Stream
     console.dir("ignoring tweet: https://twitter.com/#{data.user.screen_name}/status/#{data.id_str}, text: \"" + data.text + "\"")
 
   incStat: (name) =>
-    @stats[name] = @stats[name] + 1
+    if @stats[name]?
+      @stats[name] = @stats[name] + 1
+    else
+      @stats[name] = 1
 
   incRegionCounts: (name) =>
     if @regionCounts[name]?

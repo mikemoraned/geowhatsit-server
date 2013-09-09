@@ -5,13 +5,14 @@ class NearestRegionFinder
 
   nearest: (signature, limit, callback) ->
     @tweetCounts.tweetCountsPerRegion((results) =>
-      callback(
-        _.chain(results)
+      callback({
+        'by_most_tweets' : _.chain(results)
           .sortBy((d) -> -1 * d.tweets)
           .first(limit)
           .pluck("region")
           .filter((d) -> d.hash != "[object Object]") # remove some guff (a hack)
-          .value())
+          .value()
+      })
     )
 
 module.exports = NearestRegionFinder

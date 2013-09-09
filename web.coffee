@@ -129,12 +129,15 @@ app.get('/phrases/:sig', (req, resp) ->
   hrefsForNGrams = {}
   for nGram in sig.toNGrams()
     hrefsForNGrams[nGram] = "/ngrams/#{nGram}"
-  regionFinder.nearest(sig, 10, (nearestRegions) ->
-    nearest = for region in nearestRegions
-      {
-        name: region.hash
-        href: "/regions/#{region.hash}"
-      }
+  regionFinder.nearest(sig, 10, (nearestRegionsByAlgorithm) ->
+    nearest = {}
+    for algorithm, nearestRegions of nearestRegionsByAlgorithm
+      nearest[algorithm] = for region in nearestRegions
+        {
+          name: region.hash
+          href: "/regions/#{region.hash}"
+        }
+
     resp.send({
       signature: sig.toSignature()
       nGrams: hrefsForNGrams

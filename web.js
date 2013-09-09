@@ -155,20 +155,24 @@
       nGram = _ref[_i];
       hrefsForNGrams[nGram] = "/ngrams/" + nGram;
     }
-    return regionFinder.nearest(sig, 10, function(nearestRegions) {
-      var nearest, region;
-      nearest = (function() {
-        var _j, _len1, _results;
-        _results = [];
-        for (_j = 0, _len1 = nearestRegions.length; _j < _len1; _j++) {
-          region = nearestRegions[_j];
-          _results.push({
-            name: region.hash,
-            href: "/regions/" + region.hash
-          });
-        }
-        return _results;
-      })();
+    return regionFinder.nearest(sig, 10, function(nearestRegionsByAlgorithm) {
+      var algorithm, nearest, nearestRegions, region;
+      nearest = {};
+      for (algorithm in nearestRegionsByAlgorithm) {
+        nearestRegions = nearestRegionsByAlgorithm[algorithm];
+        nearest[algorithm] = (function() {
+          var _j, _len1, _results;
+          _results = [];
+          for (_j = 0, _len1 = nearestRegions.length; _j < _len1; _j++) {
+            region = nearestRegions[_j];
+            _results.push({
+              name: region.hash,
+              href: "/regions/" + region.hash
+            });
+          }
+          return _results;
+        })();
+      }
       return resp.send({
         signature: sig.toSignature(),
         nGrams: hrefsForNGrams,
