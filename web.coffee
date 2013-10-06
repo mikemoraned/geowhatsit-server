@@ -17,7 +17,7 @@ PhraseSignature = require("./lib/PhraseSignature")
 NearestRegionFinder = require("./lib/NearestRegionFinder")
 
 ngramLength = 2
-tweetCounts = TweetCountsFactory.create(ngramLength)
+tweetCounts = TweetCountsFactory.create("prod", ngramLength)
 regionFinder = new NearestRegionFinder(tweetCounts)
 tfidf = new TFIDF(tweetCounts)
 

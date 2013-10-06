@@ -5,14 +5,17 @@ RedisTweetCounts = require('../../lib/RedisTweetCounts')
 TweetCountsFactory = require('../../lib/TweetCountsFactory')
 LatLon = require('../../lib/LatLon')
 
+name = "TweetCountsTest_#{Math.random()}"
+precision = 4
+
 latLonExample = new LatLon(57.64911,10.40744)
+latLonAsGeoHash = "u4pruydqqvj".slice(0, precision)
 
 text =
   nGrams: ["aa","bb"]
   length: 2
 
-name = "TweetCountsTest_#{Math.random()}"
-precision = 2
+
 
 fillInNullForError = (callback) =>
   (realResult) =>
@@ -27,7 +30,7 @@ vows
         topic: (tweetCounts) ->
           tweetCounts.add(latLonExample, text)
           text
-        'when we ask for overall ngram counts':
+        'when we ask for overallNGramCounts':
           topic: (text, tweetCounts) ->
             tweetCounts.overallNGramCounts(fillInNullForError(this.callback))
             return
@@ -37,6 +40,22 @@ vows
               countForNGram[item.ngram] = item.tweets
             assert.equal countForNGram["2:aa"], 1
             assert.equal countForNGram["2:bb"], 1
+        'when we ask for tweetCountsByRegionForNGrams':
+          topic: (text, tweetCounts) ->
+            tweetCounts.tweetCountsByRegionForNGrams(text.nGrams, fillInNullForError(this.callback))
+            return
+          'each ngram has only one region': (results) ->
+            regionCountForNGram = {}
+            for item in results
+              regionCountForNGram[item.ngram] = item.regions.length
+            assert.equal regionCountForNGram["aa"], 1
+            assert.equal regionCountForNGram["bb"], 1
+          'each ngram maps to geohash for latLon, with expected precision': (results) ->
+            for item in results
+              regions = item.regions
+              assert.equal regions.length, 1
+              geoHash = regions[0].region
+              assert.equal geoHash, latLonAsGeoHash
 
   .export(module)
 

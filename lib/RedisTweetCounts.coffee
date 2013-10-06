@@ -26,7 +26,7 @@ class RedisTweetCounts
     )
 
   fullGeoHashId: (latLon) =>
-    "#{@prefix}#{GeoHashRegion.fromPointInRegion(latLon, @precision)}"
+    "#{@prefix}#{GeoHashRegion.fromPointInRegion(latLon, @precision).toHash(@precision)}"
 
   summariseRegions: (callback) =>
     @tweetCountsPerRegion((results) =>
@@ -90,7 +90,6 @@ class RedisTweetCounts
       do (ngram) =>
         @redis.hgetall("#{@globalPrefix}.ngram:#{ngram.length}:#{ngram}", (err, response) =>
           ngramsInspected += 1
-#          console.dir(response)
           results = []
           for fullId, value of response
             geoHash = fullId.toString().substring(@prefix.length)

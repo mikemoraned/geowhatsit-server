@@ -30,7 +30,7 @@
 
   ngramLength = 2;
 
-  tweetCounts = TweetCountsFactory.create(ngramLength);
+  tweetCounts = TweetCountsFactory.create("prod", ngramLength);
 
   regionFinder = new NearestRegionFinder(tweetCounts);
 
