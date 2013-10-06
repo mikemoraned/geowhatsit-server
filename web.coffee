@@ -1,4 +1,5 @@
 express = require("express")
+thisPackage = require("./package.json")
 app = express()
 app.use(express.logger())
 app.use(express.bodyParser())
@@ -29,7 +30,7 @@ app.all('*', (req, resp, next) ->
 )
 
 app.get('/', (req, resp) ->
-  resp.send('Hello World!')
+  resp.send("Version: #{thisPackage.version}")
 )
 app.get('/counts.json', (req, resp) ->
   tweetCounts.dump((dumped) ->
