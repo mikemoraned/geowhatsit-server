@@ -47,7 +47,7 @@
   });
 
   app.get('/', function(req, resp) {
-    return resp.send("Version: " + thisPackage.version);
+    return resp.send("<!doctype html>\n<html lang=en>\n<meta charset=utf-8>\n<h1>GeoWhatsit version " + thisPackage.version + "</h1>\nFor info, see: <a href=\"https://github.com/mikemoraned/geowhatsit-server\">geowhatsit-server</a> on github.");
   });
 
   app.get('/counts.json', function(req, resp) {

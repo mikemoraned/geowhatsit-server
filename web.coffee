@@ -30,7 +30,13 @@ app.all('*', (req, resp, next) ->
 )
 
 app.get('/', (req, resp) ->
-  resp.send("Version: #{thisPackage.version}")
+  resp.send("""
+              <!doctype html>
+              <html lang=en>
+              <meta charset=utf-8>
+              <h1>GeoWhatsit version #{thisPackage.version}</h1>
+              For info, see: <a href="https://github.com/mikemoraned/geowhatsit-server">geowhatsit-server</a> on github.
+              """)
 )
 app.get('/counts.json', (req, resp) ->
   tweetCounts.dump((dumped) ->
