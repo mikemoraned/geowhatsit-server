@@ -11,7 +11,6 @@ LatLon = require("./lib/LatLon")
 GeoHashRegion = require("./lib/GeoHashRegion")
 
 TweetCountsFactory = require("./lib/TweetCountsFactory")
-SurprisingNGrams = require("./lib/SurprisingNGrams")
 TFIDF = require("./lib/TFIDF")
 
 PhraseSignature = require("./lib/PhraseSignature")
@@ -19,7 +18,6 @@ NearestRegionFinder = require("./lib/NearestRegionFinder")
 
 ngramLength = 2
 tweetCounts = TweetCountsFactory.create(ngramLength)
-surprising = new SurprisingNGrams(tweetCounts)
 regionFinder = new NearestRegionFinder(tweetCounts)
 tfidf = new TFIDF(tweetCounts)
 
@@ -69,8 +67,7 @@ expandSummary = (result) ->
       href: "/regions/#{region.hash}/ngrams"
     },
     hrefs: {
-      ngrams: "/regions/#{region.hash}/ngrams",
-      surprising: "/regions/#{region.hash}/ngrams/surprising"
+      ngrams: "/regions/#{region.hash}/ngrams"
       tfidf: "/regions/#{region.hash}/ngrams/tfidf"
     }
   }
@@ -92,12 +89,6 @@ app.get('/regions/:geohash', (req, resp) ->
 
 app.get('/regions/:geohash/ngrams', (req, resp) ->
   tweetCounts.ngramCountsForRegion(req.params.geohash, (results) ->
-    resp.send(results)
-  )
-)
-
-app.get('/regions/:geohash/ngrams/surprising', (req, resp) ->
-  surprising.surprisingNGramsForRegion(req.params.geohash, (results) ->
     resp.send(results)
   )
 )
