@@ -81,6 +81,26 @@
             }
             return _results;
           }
+        },
+        'when we ask to dumpToArchive': {
+          topic: function(text, tweetCounts) {
+            tweetCounts.dumpToArchive(fillInNullForError(this.callback));
+          },
+          'all nGrams and geoHashes appear': function(archive) {
+            var expected;
+            expected = [
+              {
+                nGram: 'bb',
+                region: 'u4pr',
+                tweets: 1
+              }, {
+                nGram: 'aa',
+                region: 'u4pr',
+                tweets: 1
+              }
+            ];
+            return assert.deepEqual(archive, expected);
+          }
         }
       }
     }

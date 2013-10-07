@@ -113,6 +113,24 @@ class RedisTweetCounts
       callback(results)
     )
 
+  dumpToArchive: (callback) ->
+    @overallNGramCounts((results) =>
+      nGrams = _.chain(results).pluck("ngram").map((prefixed) -> prefixed.split(":")[1]).value()
+      console.dir(nGrams)
+      @tweetCountsByRegionForNGrams(nGrams, (results) =>
+        archive = []
+        for result in results
+          nGram = result.ngram
+          for regionTweets in result.regions
+            archive.push(
+              nGram: nGram
+              region: regionTweets.region
+              tweets: regionTweets.tweets
+            )
+        callback(archive)
+      )
+    )
+
   dump: (callback) ->
     @redis.get("#{@globalPrefix}.#{@precision}:count", (err, totalBuffer) =>
       if err?

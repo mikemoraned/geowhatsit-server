@@ -1,4 +1,5 @@
 express = require("express")
+csv = require('express-csv')
 thisPackage = require("./package.json")
 app = express()
 app.use(express.logger())
@@ -158,6 +159,16 @@ app.get('/ngrams/:ngram', (req, resp) ->
         count: result.regions
       }
     })
+  )
+)
+
+app.get('/archive/archive.csv', (req, resp) ->
+  csv = []
+  csv.push(["region","nGram","tweets"])
+  tweetCounts.dumpToArchive((archive) =>
+    for entry in archive
+      csv.push([entry.region, entry.nGram, entry.tweets ])
+    resp.csv(csv)
   )
 )
 

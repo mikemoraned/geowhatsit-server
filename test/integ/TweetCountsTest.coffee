@@ -56,6 +56,24 @@ vows
               assert.equal regions.length, 1
               geoHash = regions[0].region
               assert.equal geoHash, latLonAsGeoHash
+        'when we ask to dumpToArchive':
+          topic: (text, tweetCounts) ->
+            tweetCounts.dumpToArchive(fillInNullForError(this.callback))
+            return
+          'all nGrams and geoHashes appear': (archive) ->
+            expected = [
+              {
+                nGram: 'bb'
+                region: 'u4pr'
+                tweets: 1
+              },
+              {
+                nGram: 'aa'
+                region: 'u4pr'
+                tweets: 1
+              }
+            ]
+            assert.deepEqual archive, expected
 
   .export(module)
 
