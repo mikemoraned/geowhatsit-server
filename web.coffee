@@ -3,6 +3,7 @@ csv = require('express-csv')
 thisPackage = require("./package.json")
 app = express()
 app.use(express.logger())
+app.use(express.compress())
 app.use(express.bodyParser())
 
 _ = require('underscore')

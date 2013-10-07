@@ -12,6 +12,8 @@
 
   app.use(express.logger());
 
+  app.use(express.compress());
+
   app.use(express.bodyParser());
 
   _ = require('underscore');

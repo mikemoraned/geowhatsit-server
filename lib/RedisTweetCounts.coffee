@@ -116,7 +116,6 @@ class RedisTweetCounts
   dumpToArchive: (callback) ->
     @overallNGramCounts((results) =>
       nGrams = _.chain(results).pluck("ngram").map((prefixed) -> prefixed.split(":")[1]).value()
-      console.dir(nGrams)
       @tweetCountsByRegionForNGrams(nGrams, (results) =>
         archive = []
         for result in results

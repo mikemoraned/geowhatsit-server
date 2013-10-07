@@ -24,7 +24,7 @@ fillInNullForError = (callback) =>
 vows
   .describe('TweetCounts')
   .addBatch
-    'when using TweetCounts impl from factory':
+    'when using empty TweetCounts impl from factory':
       topic: TweetCountsFactory.create(name, precision)
       'when new text is added':
         topic: (tweetCounts) ->
