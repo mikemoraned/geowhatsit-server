@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": "snapshotter.js",
+  "sourceRoot": "",
+  "sources": [
+    "snapshotter.coffee"
+  ],
+  "names": [],
+  "mappings": ";AAAA;CAAA,KAAA,8BAAA;;CAAA,CAAA,CAAc,IAAA,IAAd,QAAc;;CAAd,CACA,CAAK,CAAA,GAAA;;CADL,CAGA,CAAS,GAAT,MAAS;CAAgB,CAClB,CAAL,CAAA,GAAY,QAAK;CADM,CAEf,CAAY,CAApB,EAAA,CAAe,WAAK;CAFG,CAGf,EAAR,EAAA,MAHuB;CAHzB,GAGS;;CAHT,CASA,CAAkB,CAAA,EAAA,KAAlB;;CATA,CAUA,CAA8F,CAAP,KAAvF,EAAW,CAAX,qCAAA;CAVA"
+}
