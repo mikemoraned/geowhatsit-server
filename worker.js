@@ -14,7 +14,7 @@
 
   TwitterAccess = require('./lib/TwitterAccess');
 
-  tweetCounts = TweetCountsFactory.create(2);
+  tweetCounts = TweetCountsFactory.create("prod", 2);
 
   collector = new MetricCollector(Graphite.initializeInHeroku(), [tweetCounts]);
 

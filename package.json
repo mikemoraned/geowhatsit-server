@@ -1,6 +1,6 @@
 {
   "name": "geowhatsit-server",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "dependencies": {
     "express": "3.1.x",
     "twitter": "~0.2.1",
@@ -12,7 +12,8 @@
     "redis": "~0.8.4",
     "natural": "~0.1.21",
     "urlencode": "0.0.1",
-    "request": "~2.27.0"
+    "request": "~2.27.0",
+    "express-csv": "~0.6.0"
   },
   "devDependencies": {
     "vows": "0.7.x"

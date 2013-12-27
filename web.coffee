@@ -1,7 +1,9 @@
 express = require("express")
+csv = require('express-csv')
 thisPackage = require("./package.json")
 app = express()
 app.use(express.logger())
+app.use(express.compress())
 app.use(express.bodyParser())
 
 _ = require('underscore')
@@ -17,7 +19,7 @@ PhraseSignature = require("./lib/PhraseSignature")
 NearestRegionFinder = require("./lib/NearestRegionFinder")
 
 ngramLength = 2
-tweetCounts = TweetCountsFactory.create(ngramLength)
+tweetCounts = TweetCountsFactory.create("prod", ngramLength)
 regionFinder = new NearestRegionFinder(tweetCounts)
 tfidf = new TFIDF(tweetCounts)
 
@@ -158,6 +160,16 @@ app.get('/ngrams/:ngram', (req, resp) ->
         count: result.regions
       }
     })
+  )
+)
+
+app.get('/archive/archive.csv', (req, resp) ->
+  csv = []
+  csv.push(["region","nGram","tweets"])
+  tweetCounts.dumpToArchive((archive) =>
+    for entry in archive
+      csv.push([entry.region, entry.nGram, entry.tweets ])
+    resp.csv(csv)
   )
 )
 

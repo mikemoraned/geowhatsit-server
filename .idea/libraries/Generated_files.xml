@@ -1,0 +1,67 @@
+<component name="libraryTable">
+  <library name="Generated files" type="javaScript">
+    <properties>
+      <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/lib/Graphite.js" />
+        <item url="file://$PROJECT_DIR$/lib/TFIDF.js" />
+        <item url="file://$PROJECT_DIR$/lib/EvaluateFromStream.js" />
+        <item url="file://$PROJECT_DIR$/lib/RedisTweetCounts.js" />
+        <item url="file://$PROJECT_DIR$/lib/TweetTokenizer.js" />
+        <item url="file://$PROJECT_DIR$/lib/MetricCollector.js" />
+        <item url="file://$PROJECT_DIR$/lib/SurprisingNGrams.js" />
+        <item url="file://$PROJECT_DIR$/lib/TweetCountsFromStream.js" />
+        <item url="file://$PROJECT_DIR$/lib/LatLon.js" />
+        <item url="file://$PROJECT_DIR$/lib/finders/ByMostTweets.js" />
+        <item url="file://$PROJECT_DIR$/lib/PhraseSignature.js" />
+        <item url="file://$PROJECT_DIR$/lib/finders/BySumOfTFIDFScore.js" />
+        <item url="file://$PROJECT_DIR$/lib/NearestRegionFinder.js" />
+        <item url="file://$PROJECT_DIR$/lib/TweetCountsFactory.js" />
+        <item url="file://$PROJECT_DIR$/lib/GeoHashRegion.js" />
+        <item url="file://$PROJECT_DIR$/worker.js" />
+        <item url="file://$PROJECT_DIR$/test/integ/RedisTweetCountsTest.js" />
+        <item url="file://$PROJECT_DIR$/lib/Stream.js" />
+        <item url="file://$PROJECT_DIR$/test/unit/LatLonTest.js" />
+        <item url="file://$PROJECT_DIR$/web.js" />
+        <item url="file://$PROJECT_DIR$/test/unit/PhraseSignatureTest.js" />
+        <item url="file://$PROJECT_DIR$/test/unit/TweetTokenizerTest.js" />
+        <item url="file://$PROJECT_DIR$/evaluate.js" />
+        <item url="file://$PROJECT_DIR$/test/unit/GeoHashRegionTest.js" />
+      </sourceFilesUrls>
+    </properties>
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/TweetTokenizer.js" />
+      <root url="file://$PROJECT_DIR$/LatLon.js" />
+      <root url="file://$PROJECT_DIR$/RedisTweetCounts.js" />
+      <root url="file://$PROJECT_DIR$/stream.js" />
+      <root url="file://$PROJECT_DIR$/TweetCountsFactory.js" />
+      <root url="file://$PROJECT_DIR$/lib/Foop.js" />
+      <root url="file://$PROJECT_DIR$/lib/Foop.js" />
+      <root url="file://$PROJECT_DIR$/lib/SurprisingNGrams.js" />
+      <root url="file://$PROJECT_DIR$/lib/PhraseSignature.js" />
+      <root url="file://$PROJECT_DIR$/lib/NearestRegionFinder.js" />
+      <root url="file://$PROJECT_DIR$/lib/Stream.js" />
+      <root url="file://$PROJECT_DIR$/lib/Graphite.js" />
+      <root url="file://$PROJECT_DIR$/lib/TFIDF.js" />
+      <root url="file://$PROJECT_DIR$/lib/EvaluateFromStream.js" />
+      <root url="file://$PROJECT_DIR$/lib/RedisTweetCounts.js" />
+      <root url="file://$PROJECT_DIR$/lib/TweetTokenizer.js" />
+      <root url="file://$PROJECT_DIR$/lib/SurprisingNGrams.js" />
+      <root url="file://$PROJECT_DIR$/lib/MetricCollector.js" />
+      <root url="file://$PROJECT_DIR$/lib/TweetCountsFromStream.js" />
+      <root url="file://$PROJECT_DIR$/lib/LatLon.js" />
+      <root url="file://$PROJECT_DIR$/lib/finders/ByMostTweets.js" />
+      <root url="file://$PROJECT_DIR$/lib/finders/BySumOfTFIDFScore.js" />
+      <root url="file://$PROJECT_DIR$/lib/TweetCountsFactory.js" />
+      <root url="file://$PROJECT_DIR$/test/integ/TweetCountsTest.js" />
+      <root url="file://$PROJECT_DIR$/worker.js" />
+      <root url="file://$PROJECT_DIR$/lib/GeoHashRegion.js" />
+      <root url="file://$PROJECT_DIR$/test/unit/LatLonTest.js" />
+      <root url="file://$PROJECT_DIR$/test/unit/PhraseSignatureTest.js" />
+      <root url="file://$PROJECT_DIR$/web.js" />
+      <root url="file://$PROJECT_DIR$/test/unit/TweetTokenizerTest.js" />
+      <root url="file://$PROJECT_DIR$/evaluate.js" />
+      <root url="file://$PROJECT_DIR$/test/unit/GeoHashRegionTest.js" />
+    </CLASSES>
+    <SOURCES />
+  </library>
+</component>
