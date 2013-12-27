@@ -22,6 +22,7 @@ class Snapshotter
           'Content-Length': response.headers['content-length']
           'Content-Type': response.headers['content-type']
           'Date' : response.headers['date']
+          'x-amz-storage-class' : 'REDUCED_REDUNDANCY'
         })
         s3Request.on('response', (result) =>
           if (result.statusCode == 200)
