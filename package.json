@@ -13,7 +13,8 @@
     "natural": "~0.1.21",
     "urlencode": "0.0.1",
     "request": "~2.27.0",
-    "express-csv": "~0.6.0"
+    "express-csv": "~0.6.0",
+    "knox": "~0.8.8"
   },
   "devDependencies": {
     "vows": "0.7.x"
