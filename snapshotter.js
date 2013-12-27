@@ -4,7 +4,7 @@
 
   Snapshotter = require('./lib/Snapshotter');
 
-  S3 = require('s3');
+  S3 = require('knox');
 
   client = S3.createClient({
     key: process.env['AMAZON_S3_KEY'],
